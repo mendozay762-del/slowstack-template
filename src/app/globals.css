@@ -1,26 +1,114 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+ * Class-based dark mode
+ *
+ * Tailwind v4's default `dark:` variant fires on `prefers-color-scheme: dark`.
+ * We want it driven by a `.dark` class on <html> so users can toggle it
+ * (next-themes manages the class). The custom variant below redefines `dark:`
+ * to match any element that is, or descends from, an element with `.dark`.
+ *
+ * `:where()` keeps the selector at specificity 0 so dark utilities still
+ * cascade predictably alongside other utilities.
+ * ------------------------------------------------------------------------- */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+ * Theme tokens
+ *
+ * Semantic colors live as CSS custom properties on :root (light) and .dark
+ * (dark). The Tailwind utilities (bg-background, text-foreground, etc.) are
+ * registered in the @theme block below and read these vars at runtime.
+ *
+ * Light palette mirrors the dark palette role-for-role:
+ *   background → near-white (vs gray-950)
+ *   foreground → slate-900  (vs gray-200)
+ *   muted      → slate-800 @ 70% (vs indigo-200 @ 70%)
+ *   accent     → indigo-600 (slightly darker than the dark-mode indigo-500
+ *                so it hits AA contrast on white)
+ * ------------------------------------------------------------------------- */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;                 /* slate-900 */
+  --muted: rgb(30 41 59 / 0.7);          /* slate-800 @ 70% */
+  --accent: #4f46e5;                     /* indigo-600 */
+  --rule: rgb(99 102 241 / 0.3);         /* indigo-500 @ 30% — eyebrow side rules */
+
+  /* Headline gradient stops (animated horizontal sweep). Five stops so the
+     loop is seamless: stop 5 == stop 1. */
+  --grad-1: #0f172a;                     /* slate-900 */
+  --grad-2: #4338ca;                     /* indigo-700 */
+  --grad-3: #334155;                     /* slate-700 */
+  --grad-4: #6366f1;                     /* indigo-500 */
+  --grad-5: #0f172a;
+
+  /* Decorative blob colors — light mode keeps them faint, mostly indigo. */
+  --blob-a: rgb(99 102 241 / 0.18);      /* indigo-500 @ 18% */
+  --blob-b: rgb(139 92 246 / 0.14);      /* violet-500 @ 14% */
 }
 
+.dark {
+  --background: #030712;                 /* gray-950 */
+  --foreground: #e5e7eb;                 /* gray-200 */
+  --muted: rgb(199 210 254 / 0.7);       /* indigo-200 @ 70% */
+  --accent: #6366f1;                     /* indigo-500 */
+  --rule: rgb(199 210 254 / 0.3);        /* indigo-200 @ 30% */
+
+  --grad-1: #e5e7eb;                     /* gray-200 */
+  --grad-2: #c7d2fe;                     /* indigo-200 */
+  --grad-3: #f9fafb;                     /* gray-50 */
+  --grad-4: #a5b4fc;                     /* indigo-300 */
+  --grad-5: #e5e7eb;
+
+  --blob-a: rgb(99 102 241 / 0.25);
+  --blob-b: rgb(139 92 246 / 0.2);
+}
+
+/* ---------------------------------------------------------------------------
+ * Tailwind @theme — registers fonts, semantic colors, and the gradient
+ * animation as utility classes.
+ *
+ * `inline` is critical here: it tells Tailwind to keep `var(...)` references
+ * unresolved in generated CSS, so when `.dark` flips the underlying var the
+ * utility classes pick up the new value automatically. Without `inline`,
+ * Tailwind would substitute the light-mode value at build time and the dark
+ * mode would never apply.
+ *
+ * Naming note: next/font (in layout.tsx) writes the loaded font family to
+ * `--font-inter-loaded` / `--font-geist-loaded`. We re-expose them here under
+ * the names the user-facing utilities need (`--font-inter` → `font-inter`,
+ * `--font-geist` → `font-geist`). The two-name dance avoids the recursive
+ * `--font-inter: var(--font-inter)` definition that would otherwise occur.
+ * ------------------------------------------------------------------------- */
 @theme inline {
+  --font-inter: var(--font-inter-loaded), system-ui, sans-serif;
+  --font-geist: var(--font-geist-loaded), system-ui, sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-rule: var(--rule);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Animated gradient: shifts background-position 200% across 6s on loop.
+     Pair with `bg-[length:200%_auto]` and a 5-stop linear-gradient on the
+     element itself. Used on headlines via `animate-gradient-sweep`. */
+  --animate-gradient-sweep: gradient-sweep 6s linear infinite;
+
+  @keyframes gradient-sweep {
+    to {
+      background-position: 200% center;
+    }
   }
 }
 
+/* ---------------------------------------------------------------------------
+ * Base body styles — Inter for prose, themed bg/fg, font smoothing.
+ * ------------------------------------------------------------------------- */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
