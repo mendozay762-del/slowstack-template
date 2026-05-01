@@ -9,7 +9,7 @@
 import { useState, type FormEvent } from "react";
 import { Eyebrow } from "@/components/eyebrow";
 import { PrimaryButton } from "@/components/primary-button";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -30,22 +30,29 @@ export function Signup() {
     }
 
     setLoading(true);
-    const { error: dbError } = await supabase
-      .from("signups")
-      .insert({ email: cleaned });
-    setLoading(false);
+    try {
+      const supabase = getSupabaseClient();
+      const { error: dbError } = await supabase
+        .from("signups")
+        .insert({ email: cleaned });
 
-    if (dbError) {
-      // 23505 = Postgres unique_violation → email already exists
-      if (dbError.code === "23505") {
-        setError("You're already on the list.");
-      } else {
-        setError("Something went wrong. Try again.");
+      if (dbError) {
+        // 23505 = Postgres unique_violation → email already exists
+        if (dbError.code === "23505") {
+          setError("You're already on the list.");
+        } else {
+          setError("Something went wrong. Try again.");
+        }
+        return;
       }
-      return;
-    }
 
-    setSubmitted(true);
+      setSubmitted(true);
+    } catch {
+      // Covers missing env vars or unexpected supabase-js throws.
+      setError("Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
