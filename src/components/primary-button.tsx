@@ -16,7 +16,7 @@ type AnchorProps = CommonProps & {
 };
 
 type ButtonProps = CommonProps & {
-  href?: undefined;
+  // No `href` field — its absence is the discriminant for the union below.
   type?: "submit" | "button" | "reset";
   disabled?: boolean;
   loading?: boolean;
@@ -57,7 +57,8 @@ export function PrimaryButton(props: AnchorProps | ButtonProps) {
 
   const className = `${BASE} ${props.className ?? ""}`;
 
-  if ("href" in props && props.href) {
+  // After this guard, TS narrows `props` to ButtonProps.
+  if ("href" in props) {
     return (
       <a href={props.href} className={className}>
         {content}
