@@ -32,6 +32,10 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  // The mounted-flag hydration pattern is the canonical next-themes workaround
+  // for SSR/client mismatches; the lint rule's "no setState in effect" doesn't
+  // apply here — we *want* exactly one render after hydration.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   // Pre-mount: neutral placeholder, identical on server and first client pass.
