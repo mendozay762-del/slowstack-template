@@ -36,3 +36,9 @@ export async function signInWithMagicLink(email: string) {
   if (error) return { error: error.message };
   return { success: true as const, message: "Check your email" };
 }
+
+export async function signOut() {
+  const supabase = await getSupabaseServerClient();
+  await supabase.auth.signOut();
+  redirect("/");
+}
