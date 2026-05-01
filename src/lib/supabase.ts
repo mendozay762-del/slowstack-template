@@ -1,12 +1,13 @@
 /**
  * Supabase browser client — lazily constructed.
  *
- * Importing this module is side-effect free. The actual client is created
- * on first call to `getSupabaseClient()`, which keeps `createClient` out of
- * the static prerender path (where env vars aren't reliably available).
+ * Uses createBrowserClient from @supabase/ssr (cookie-aware) so auth state
+ * stays consistent with the server-side client in supabase-server.ts.
+ * Module is import-side-effect free; the client is built on first call.
  */
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 let client: SupabaseClient | null = null;
 
@@ -22,6 +23,6 @@ export function getSupabaseClient(): SupabaseClient {
     );
   }
 
-  client = createClient(url, anonKey);
+  client = createBrowserClient(url, anonKey);
   return client;
 }
