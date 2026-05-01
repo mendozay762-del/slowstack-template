@@ -5,8 +5,10 @@
  *   `<section>` → `mx-auto max-w-6xl px-4 sm:px-6` → `py-12 md:py-20`
  */
 
+import Link from "next/link";
 import { Eyebrow } from "@/components/eyebrow";
 import { PrimaryButton } from "@/components/primary-button";
+import { SecondaryButton } from "@/components/secondary-button";
 import { Signup } from "@/components/signup";
 
 export default function Home() {
@@ -220,58 +222,6 @@ function ForwardIcon({ className }: IconProps) {
 }
 
 /* ---------------------------------------------------------------------------
- * <SecondaryButton> — ghost button with a 1px gradient ring.
- *
- * The gradient ring is the trickiest CSS in this file. `border-image` doesn't
- * play nicely with `border-radius`, so we draw the ring with a pseudo-element
- * + mask-compositing instead:
- *
- *   1. A ::before pseudo absolutely fills the parent (`absolute inset-0`).
- *   2. `p-px` creates a 1px gap between its content-box and padding-box.
- *   3. The gradient is set as `background` and fills the padding-box (default
- *      `background-clip`).
- *   4. The mask declares two layers:
- *        a) linear-gradient(#fff 0 0) content-box  — paints the content-box
- *        b) linear-gradient(#fff 0 0)              — paints the padding-box
- *      With `mask-composite: exclude`, the visible area is everything in (b)
- *      that is NOT in (a) — i.e., the 1px ring between content and padding.
- *   5. `pointer-events-none` so the pseudo doesn't eat clicks.
- *   6. `rounded-[inherit]` so the ring follows the parent's border-radius.
- * ------------------------------------------------------------------------- */
-function SecondaryButton({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <a
-      href={href}
-      className="
-        relative inline-flex items-center justify-center
-        rounded-lg px-5 py-2.5
-        text-sm font-medium text-foreground
-        bg-foreground/[0.04]
-        transition-colors hover:bg-foreground/[0.08]
-        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
-
-        before:content-[''] before:pointer-events-none
-        before:absolute before:inset-0 before:rounded-[inherit] before:p-px
-        before:[background:linear-gradient(to_right,var(--rule),var(--accent),var(--rule))]
-        before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]
-        before:[mask-composite:exclude]
-      "
-    >
-      {/* Wrapped in a positioned span so it paints AFTER the absolute
-          ::before in the parent's stacking context — otherwise the ring
-          can clip over text near the edges. */}
-      <span className="relative">{children}</span>
-    </a>
-  );
-}
-
-/* ---------------------------------------------------------------------------
  * <HeroBlobs> — two large blurred circles for ambient color behind the hero.
  *
  *   pointer-events-none        → never blocks clicks
@@ -342,6 +292,14 @@ function Footer() {
             </div>
 
             <ul className="flex gap-6 text-sm">
+              <li>
+                <Link
+                  href="/sign-in"
+                  className="text-muted transition-colors hover:text-foreground"
+                >
+                  Sign in
+                </Link>
+              </li>
               {links.map((label) => (
                 <li key={label}>
                   <a

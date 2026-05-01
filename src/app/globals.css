@@ -33,6 +33,8 @@
   --muted: rgb(30 41 59 / 0.7);          /* slate-800 @ 70% */
   --accent: #4f46e5;                     /* indigo-600 */
   --rule: rgb(99 102 241 / 0.3);         /* indigo-500 @ 30% — eyebrow side rules */
+  --border: rgb(15 23 42 / 0.15);        /* slate-900 @ 15% — input/card borders */
+  --muted-foreground: rgb(30 41 59 / 0.7); /* slate-800 @ 70% — placeholders, secondary text */
 
   /* Headline gradient stops (animated horizontal sweep). Five stops so the
      loop is seamless: stop 5 == stop 1. */
@@ -53,6 +55,8 @@
   --muted: rgb(199 210 254 / 0.7);       /* indigo-200 @ 70% */
   --accent: #6366f1;                     /* indigo-500 */
   --rule: rgb(199 210 254 / 0.3);        /* indigo-200 @ 30% */
+  --border: rgb(229 231 235 / 0.15);     /* gray-200 @ 15% */
+  --muted-foreground: rgb(199 210 254 / 0.7); /* indigo-200 @ 70% */
 
   --grad-1: #e5e7eb;                     /* gray-200 */
   --grad-2: #c7d2fe;                     /* indigo-200 */
@@ -89,6 +93,8 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-rule: var(--rule);
+  --color-border: var(--border);
+  --color-muted-foreground: var(--muted-foreground);
 
   /* Animated gradient: shifts background-position 200% across 6s on loop.
      Pair with `bg-[length:200%_auto]` and a 5-stop linear-gradient on the
