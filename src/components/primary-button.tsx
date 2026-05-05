@@ -13,6 +13,8 @@ type CommonProps = {
 
 type AnchorProps = CommonProps & {
   href: string;
+  target?: string;
+  rel?: string;
 };
 
 type ButtonProps = CommonProps & {
@@ -60,7 +62,12 @@ export function PrimaryButton(props: AnchorProps | ButtonProps) {
   // After this guard, TS narrows `props` to ButtonProps.
   if ("href" in props) {
     return (
-      <a href={props.href} className={className}>
+      <a
+        href={props.href}
+        target={props.target}
+        rel={props.rel}
+        className={className}
+      >
         {content}
       </a>
     );
