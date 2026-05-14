@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Eyebrow } from "@/components/eyebrow";
 import { PrimaryButton } from "@/components/primary-button";
 import { SignOutButton } from "@/components/sign-out-button";
+import { getActiveSubscription } from "@/lib/subscriptions";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 
 export default async function DashboardPage() {
@@ -19,6 +20,8 @@ export default async function DashboardPage() {
   // Read at render time. NEXT_PUBLIC_* is inlined at build, so a missing
   // value here = missing in the env, not just on this server.
   const stripeUrl = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK;
+  const subscription = await getActiveSubscription(user.id);
+  const isSubscribed = subscription !== null;
 
   return (
     <main className="mx-auto w-full max-w-md px-4 py-12 md:py-20">
@@ -38,23 +41,31 @@ export default async function DashboardPage() {
       </div>
 
       <div className="space-y-6">
-        <p className="text-center text-sm text-muted">
-          Signed in as: {user.email}
-        </p>
-        <div className="flex flex-col items-center gap-3">
-          {stripeUrl ? (
-            <PrimaryButton
-              href={stripeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Subscribe
-            </PrimaryButton>
-          ) : (
-            <PrimaryButton disabled>
-              Subscribe (not configured)
-            </PrimaryButton>
+        <div className="text-center">
+          <p className="text-sm text-muted">Signed in as: {user.email}</p>
+          {isSubscribed && (
+            <p className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-emerald-500">
+              <span
+                className="h-2 w-2 rounded-full bg-emerald-500"
+                aria-hidden="true"
+              />
+              Subscription active
+            </p>
           )}
+        </div>
+        <div className="flex flex-col items-center gap-3">
+          {!isSubscribed &&
+            (stripeUrl ? (
+              <PrimaryButton
+                href={stripeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Subscribe
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton disabled>Subscribe (not configured)</PrimaryButton>
+            ))}
           <SignOutButton />
         </div>
       </div>
